@@ -5,7 +5,7 @@ for (let i = 1; i < 32; i++) {
 }
 
 class Node {
-    constructor(data, left, right) {
+    constructor(data, left = null, right = null) {
         this.data = data;
         this.left = left;
         this.right = right;
@@ -14,8 +14,8 @@ class Node {
 
 class Tree {
     constructor(array) {
-        const sorted = removeDupes(mergeSort(array));
-        this.root = this.buildTree(sorted, 0, sorted.length - 1);
+        const cleaned = removeDupes(mergeSort(array));
+        this.root = this.buildTree(cleaned, 0, cleaned.length - 1);
     }
 
     buildTree(array, start, end) {
@@ -24,7 +24,85 @@ class Tree {
         return new Node(array[mid], this.buildTree(array, start, mid - 1), this.buildTree(array, mid + 1, end));
     }
 
+    insert(value, node = this.root) {
+        if (node.data === value) return;
+        if (node.data > value && node.left === null) return node.left = new Node(value);
+        if (node.data < value && node.right === null) return node.right = new Node(value);
+        if (node.data > value && node.left !== null) this.insert(value, node.left);
+        if (node.data < value && node.right !== null) this.insert(value, node.right);
+    }
 
+    delete(value, node = this.root) {
+        if (node.data > value) node.left = this.delete(value, node.left);
+        else if (node.data < value) node.right = this.delete(value, node.right);
+        else {
+            if (node.left === null && node.right === null) {
+                node = null;
+            } else if (node.left === null) {
+                node = node.right;
+            } else if (node.right === null) {
+                node = node.left;
+            } else {
+                let min = node.right;
+                while (min.left !== null) min = min.left;
+                node.data = min.data;
+                node.right = this.delete(min.data, node.right);
+            }
+        }
+        return node;
+    }
+
+    find(value, node = this.root) {
+        if (node === null) return null;
+        if (node.data === value) return node;
+        if (node.data > value) return this.find(value, node.left);
+        if (node.data < value) return this.find(value, node.right);
+    }
+
+    noCallback(cb) {
+        let arr = [];
+        cb((data) => arr.push(data)).call(this);
+        return (arr);
+    }
+
+    levelOrder(cb, node = this.root) {
+        if (!cb) {
+            return this.noCallback(this.levelOrder);
+        }
+
+        //needs to be written
+    }
+
+    preOrder(cb, node = this.root) {
+        if (!cb) {
+            this.noCallback(this.preOrder);     
+        }
+        cb(node.data);
+        if (node.left !== null) this.preOrder(cb, node.left);
+        if (node.right !== null) this.preOrder(cb, node.right);
+    }
+
+    inOrder(cb, node = this.root) {
+        if (!cb) {
+            let arr = [];
+            this.inOrder((data) => arr.push(data));
+            return (arr);
+        }
+        if (node.left !== null) this.inOrder(cb, node.left);
+        cb(node.data);
+        if (node.right !== null) this.inOrder(cb, node.right);
+    }
+
+    postOrder(cb, node = this.root) {
+        if (!cb) {
+            let arr = [];
+            this.postOrder((data) => arr.push(data));
+            return (arr);        
+        }
+        if (node.left !== null) this.postOrder(cb, node.left);
+        if (node.right !== null) this.postOrder(cb, node.right);
+        cb(node.data);
+    }
 }
 
 function prettyPrint(node, prefix = '', isLeft = true) {
@@ -71,5 +149,3 @@ function removeDupes(arr) {
     }
     return arr;
 }
-
-//function insert(item, )
