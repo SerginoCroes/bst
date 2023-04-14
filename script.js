@@ -61,44 +61,32 @@ class Tree {
 
     noCallback(cb) {
         let arr = [];
-        cb((data) => arr.push(data)).call(this);
+        cb.call(this, (data) => arr.push(data));
         return (arr);
     }
 
     levelOrder(cb, node = this.root) {
-        if (!cb) {
-            return this.noCallback(this.levelOrder);
-        }
-
+        if (!cb) return this.noCallback(this.levelOrder);
+        
         //needs to be written
     }
 
     preOrder(cb, node = this.root) {
-        if (!cb) {
-            this.noCallback(this.preOrder);     
-        }
+        if (!cb) return this.noCallback(this.preOrder);
         cb(node.data);
         if (node.left !== null) this.preOrder(cb, node.left);
         if (node.right !== null) this.preOrder(cb, node.right);
     }
 
     inOrder(cb, node = this.root) {
-        if (!cb) {
-            let arr = [];
-            this.inOrder((data) => arr.push(data));
-            return (arr);
-        }
+        if (!cb) return this.noCallback(this.inOrder);
         if (node.left !== null) this.inOrder(cb, node.left);
         cb(node.data);
         if (node.right !== null) this.inOrder(cb, node.right);
     }
 
     postOrder(cb, node = this.root) {
-        if (!cb) {
-            let arr = [];
-            this.postOrder((data) => arr.push(data));
-            return (arr);        
-        }
+        if (!cb) return this.noCallback(this.postOrder);
         if (node.left !== null) this.postOrder(cb, node.left);
         if (node.right !== null) this.postOrder(cb, node.right);
         cb(node.data);
