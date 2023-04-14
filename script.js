@@ -67,8 +67,14 @@ class Tree {
 
     levelOrder(cb, node = this.root) {
         if (!cb) return this.noCallback(this.levelOrder);
-        
-        //needs to be written
+        let queue = [node];
+        let index = 0;
+        while (index < queue.length) {
+            cb(queue[index].data);
+            if (queue[index].left !== null) queue.push(queue[index].left);
+            if (queue[index].right !== null) queue.push(queue[index].right);
+            index ++;
+        }
     }
 
     preOrder(cb, node = this.root) {
