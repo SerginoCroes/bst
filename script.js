@@ -15,7 +15,7 @@ class Tree {
     buildTree(array, start, end) {
         if (start > end) return null;
         const mid = Math.floor((start + end) / 2);
-        return new Node(array[mid], this.buildTree(array, start, mid - 1), this.buildTree(array, mid + 1, end));        
+        return new Node(array[mid], this.buildTree(array, start, mid - 1), this.buildTree(array, mid + 1, end));
     }
 
     insert(value, node = this.root) {
@@ -60,8 +60,8 @@ class Tree {
 
     levelOrder(cb) {
         if (!cb) return this.noCallback(this.levelOrder);
-        let queue = [this.root];        
-        for (let i = 0; i < queue.length; i ++) {
+        let queue = [this.root];
+        for (let i = 0; i < queue.length; i++) {
             cb(queue[i].data);
             if (queue[i].left !== null) queue.push(queue[i].left);
             if (queue[i].right !== null) queue.push(queue[i].right);
@@ -102,7 +102,7 @@ class Tree {
 
     isBalanced(node = this.root) {
         if (node === null) return true;
-        const dif = Math.abs(this.height(node.left) - this.height(node.right)) <= 1
+        const dif = Math.abs(this.height(node.left) - this.height(node.right)) <= 1;
         return dif && this.isBalanced(node.left) && this.isBalanced(node.right);
     }
 
@@ -136,12 +136,12 @@ function removeDupes(arr) {
 
 function test() {
     const testArray = [];
-    for (let i = 0; i < 30; i++) testArray.push(Math.floor(Math.random()*100));
+    for (let i = 0; i < 30; i++) testArray.push(Math.floor(Math.random() * 100));
     const tree = new Tree(testArray);
     prettyPrint(tree.root);
     console.log('balanced: ', tree.isBalanced());
     console.table([tree.levelOrder(), tree.preOrder(), tree.inOrder(), tree.postOrder()]);
-    for (let i = 0; i < 10; i++) tree.insert(testArray[Math.floor(Math.random()*30)] + 100);
+    for (let i = 0; i < 10; i++) tree.insert(testArray[Math.floor(Math.random() * 30)] + 100);
     prettyPrint(tree.root);
     console.log('balanced: ', tree.isBalanced());
     tree.reBalance();
