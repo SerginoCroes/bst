@@ -1,9 +1,3 @@
-const testArray = [];
-
-for (let i = 1; i < 32; i++) {
-    testArray.push(i);
-}
-
 class Node {
     constructor(data, left = null, right = null) {
         this.data = data;
@@ -14,14 +8,14 @@ class Node {
 
 class Tree {
     constructor(array) {
-        const cleaned = removeDupes(mergeSort(array));
+        const cleaned = removeDupes(array.sort((a, b) => a - b));
         this.root = this.buildTree(cleaned, 0, cleaned.length - 1);
     }
 
     buildTree(array, start, end) {
         if (start > end) return null;
         const mid = Math.floor((start + end) / 2);
-        return new Node(array[mid], this.buildTree(array, start, mid - 1), this.buildTree(array, mid + 1, end));
+        return new Node(array[mid], this.buildTree(array, start, mid - 1), this.buildTree(array, mid + 1, end));        
     }
 
     insert(value, node = this.root) {
@@ -55,8 +49,7 @@ class Tree {
     find(value, node = this.root) {
         if (node === null) return null;
         if (node.data === value) return node;
-        if (node.data > value) return this.find(value, node.left);
-        if (node.data < value) return this.find(value, node.right);
+        return this.find(value, node.data > value ? node.left : node.right);
     }
 
     noCallback(cb) {
@@ -65,15 +58,13 @@ class Tree {
         return (arr);
     }
 
-    levelOrder(cb, node = this.root) {
+    levelOrder(cb) {
         if (!cb) return this.noCallback(this.levelOrder);
-        let queue = [node];
-        let index = 0;
-        while (index < queue.length) {
-            cb(queue[index].data);
-            if (queue[index].left !== null) queue.push(queue[index].left);
-            if (queue[index].right !== null) queue.push(queue[index].right);
-            index ++;
+        let queue = [this.root];        
+        for (let i = 0; i < queue.length; i ++) {
+            cb(queue[i].data);
+            if (queue[i].left !== null) queue.push(queue[i].left);
+            if (queue[i].right !== null) queue.push(queue[i].right);
         }
     }
 
@@ -97,6 +88,28 @@ class Tree {
         if (node.right !== null) this.postOrder(cb, node.right);
         cb(node.data);
     }
+
+    height(node = this.root) {
+        if (node === null) return -1;
+        return Math.max(this.height(node.left), this.height(node.right)) + 1;
+    }
+
+    depth(value, node = this.root, depth = 0) {
+        if (node === null) return null;
+        if (node.data === value) return depth;
+        return this.depth(value, node.data > value ? node.left : node.right, depth + 1);
+    }
+
+    isBalanced(node = this.root) {
+        if (node === null) return true;
+        const dif = Math.abs(this.height(node.left) - this.height(node.right)) <= 1
+        return dif && this.isBalanced(node.left) && this.isBalanced(node.right);
+    }
+
+    reBalance() {
+        const arr = this.inOrder();
+        this.root = this.buildTree(arr, 0, arr.length - 1);
+    }
 }
 
 function prettyPrint(node, prefix = '', isLeft = true) {
@@ -112,34 +125,27 @@ function prettyPrint(node, prefix = '', isLeft = true) {
     }
 }
 
-function mergeSort([...arr]) {
-    if (arr.length === 1) return arr;
-    const half = Math.floor(arr.length / 2);
-    const left = arr.splice(0, half);
-    const right = arr;
-    return merge(mergeSort(left), mergeSort(right));
-}
-
-function merge(left, right) {
-    let arr = [];
-    const length = left.length + right.length;
-    for (let i = 0; i < length; i++) {
-        if (left.length < 1) {
-            arr = [...arr, ...right];
-            break;
-        }
-        if (right.length < 1) {
-            arr = [...arr, ...left];
-            break;
-        }
-        arr.push(left[0] < right[0] ? left.shift() : right.shift());
-    }
-    return arr;
-}
-
 function removeDupes(arr) {
-    for (let i = 1; i < arr.length; i++) {
+    let i = 0;
+    while (i < arr.length) {
         if (arr[i - 1] === arr[i]) arr.splice(i, 1);
+        else i++;
     }
     return arr;
+}
+
+function test() {
+    const testArray = [];
+    for (let i = 0; i < 30; i++) testArray.push(Math.floor(Math.random()*100));
+    const tree = new Tree(testArray);
+    prettyPrint(tree.root);
+    console.log('balanced: ', tree.isBalanced());
+    console.table([tree.levelOrder(), tree.preOrder(), tree.inOrder(), tree.postOrder()]);
+    for (let i = 0; i < 10; i++) tree.insert(testArray[Math.floor(Math.random()*30)] + 100);
+    prettyPrint(tree.root);
+    console.log('balanced: ', tree.isBalanced());
+    tree.reBalance();
+    prettyPrint(tree.root);
+    console.log('balanced: ', tree.isBalanced());
+    console.table([tree.levelOrder(), tree.preOrder(), tree.inOrder(), tree.postOrder()]);
 }
